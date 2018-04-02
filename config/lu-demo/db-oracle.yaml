@@ -1,0 +1,19 @@
+template_path: templates/rds.yaml
+
+
+parameters:
+  ResourcePrefix: rds
+  VpcId: !stack_output vpc::VpcId
+  SubnetAZ0Id: !stack_output vpc::PrivateSubnetAZ0
+  SubnetAZ1Id: !stack_output vpc::PrivateSubnetAZ1
+  DbName: tamdemodb
+  MultiAz: "false"
+  PubliclyAccessible: "false"
+  DbEngine: mysql
+  DbVersion: "5.6"
+  DbPort: "3306"
+  DbInstanceClass: db.t2.medium
+  AllocatedStorage: "10"
+  RdsUsername: foobarbaz
+  RdsPassword: foobarbaz
+  DBIngressSG: !stack_output bastion::SecurityGroupId

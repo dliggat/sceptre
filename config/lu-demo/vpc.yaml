@@ -1,0 +1,12 @@
+template_path: templates/vpc.j2
+
+parameters:
+  ResourcePrefix: lu-demo
+  VpcCidr: "10.0.0.0/16"
+  PublicSubnetAZ0Cidr: "10.0.0.0/24"
+  PublicSubnetAZ1Cidr: "10.0.1.0/24"
+  PrivateSubnetAZ0Cidr: "10.0.3.0/24"
+  PrivateSubnetAZ1Cidr: "10.0.4.0/24"
+
+sceptre_user_data:
+  az_count: 2

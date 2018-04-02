@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: A standard VPC.
+
+Parameters:
+  ResourcePrefix:
+    Type: String
+    Description: A description to identify resources (e.g. "my-perf-test")
+
+  VpcCidr:
+    Type: String
+    Description: A network CIDR e.g. "10.0.0.0/16"
+
+  {% for i in range(sceptre_user_data.az_count) %}
+  PublicSubnetAZ{{ i }}Cidr:
+    Type: String
+    Description: A subnet CIDR e.g. "10.0.{{ i }}.0/24"
+
+  PrivateSubnetAZ{{ i }}Cidr:
+    Type: String
+    Description: A subnet CIDR e.g. "10.0.{{ i + 10 }}.0/24"
+
+  {% endfor %}
+
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: True
+      EnableDnsHostnames: True
+      InstanceTenancy: default
+      CidrBlock: { Ref: VpcCidr }
+      Tags: [ { Key: Name, Value: { Ref: ResourcePrefix } } ]
+
+  DHCPSettings:
+    Type: AWS::EC2::DHCPOptions
+    Properties:
+      DomainNameServers:  [ "AmazonProvidedDNS" ]
+      DomainName:  ec2-internal
+
+  DHCPSettingsAssociation:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      VpcId: { "Ref" : "Vpc" }
+      DhcpOptionsId: { "Ref" : "DHCPSettings" }
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value:
+            "Fn::Join":
+              - "-"
+              - - { Ref: ResourcePrefix }
+                - "internetgateway"
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: { "Ref": "Vpc" }
+      InternetGatewayId : { "Ref" : "InternetGateway" }
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: { Ref : Vpc }
+      Tags:
+        - Key: Name
+          Value:
+            "Fn::Join":
+              - "-"
+              - - { Ref: ResourcePrefix }
+                - "rtb"
+                - "public"
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: { "Ref": "Vpc" }
+      Tags:
+        - Key: Name
+          Value:
+            "Fn::Join":
+              - "-"
+              - - { Ref: ResourcePrefix }
+                - "rtb"
+                - "private"
+
+  RoutePublicToInternet:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: "0.0.0.0/0"
+      RouteTableId:  { Ref: PublicRouteTable }
+      GatewayId:     { Ref: InternetGateway }
+
+  {% for i in range(sceptre_user_data.az_count) %}
+  PublicSubnetAZ{{ i }}:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: { Ref: Vpc }
+      AvailabilityZone: { "Fn::Select": [ "{{ i }}", { "Fn::GetAZs": "" } ] }
+      MapPublicIpOnLaunch: "true"
+      CidrBlock: { Ref: PublicSubnetAZ{{ i }}Cidr }
+      Tags:
+        - Key: Name
+          Value:
+            "Fn::Join":
+              - "-"
+              - - { Ref: ResourcePrefix }
+                - "public"
+                - { "Fn::Select": [ "{{ i }}", { "Fn::GetAZs": "" } ] }
+  SubnetRouteTableAssociationPublicAZ{{ i }}:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: { Ref: PublicSubnetAZ{{ i }} }
+      RouteTableId: { Ref: PublicRouteTable }
+
+  PrivateSubnetAZ{{ i }}:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: { Ref: Vpc }
+      AvailabilityZone: { "Fn::Select": [ "{{ i }}", { "Fn::GetAZs": "" } ] }
+      CidrBlock: { Ref: PrivateSubnetAZ{{ i }}Cidr }
+      Tags:
+        - Key: Name
+          Value:
+            "Fn::Join":
+              - "-"
+              - - { Ref: ResourcePrefix }
+                - "private"
+                - { "Fn::Select": [ "{{ i }}", { "Fn::GetAZs": "" } ] }
+  SubnetRouteTableAssociationPrivateAZ{{ i }}:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: { Ref: PrivateSubnetAZ{{ i }} }
+      RouteTableId: { Ref: PrivateRouteTable }
+
+  {% endfor %}
+
+Outputs:
+  DefaultSecurityGroupId:
+    Value:
+      "Fn::GetAtt": [Vpc, DefaultSecurityGroup]
+  VpcId:
+    Value: { Ref: Vpc }
+    Export:
+      Name:
+        "Fn::Join":
+          - "-"
+          - - { Ref: ResourcePrefix }
+            - "VpcId"
+
+  {% for i in range(sceptre_user_data.az_count) %}
+  PublicSubnetAZ{{ i }}:
+    Value: { Ref: PublicSubnetAZ{{ i }} }
+    Export:
+      Name:
+        "Fn::Join":
+          - "-"
+          - - { Ref: ResourcePrefix }
+            - PublicSubnetAZ{{ i }}
+
+  PrivateSubnetAZ{{ i }}:
+    Value: { Ref: PrivateSubnetAZ{{ i }} }
+    Export:
+      Name:
+        "Fn::Join":
+          - "-"
+          - - { Ref: ResourcePrefix }
+            - PrivateSubnetAZ{{ i }}
+
+  {% endfor %}
+
