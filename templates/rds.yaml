@@ -36,6 +36,10 @@ Parameters:
   DbInstanceClass:
     Type: String
 
+  LicenseModel:
+    Type: String
+    Default: ""
+
   AllocatedStorage:
     Type: String
 
@@ -84,6 +88,7 @@ Resources:
       EngineVersion: { Ref: DbVersion }
       MasterUsername: { Ref: RdsUsername }
       MasterUserPassword: { Ref: RdsPassword }
+      LicenseModel: { Ref: LicenseModel }
       MultiAZ: { Ref: MultiAz }
       Port: { Ref: DbPort }
       PubliclyAccessible: { Ref: PubliclyAccessible }

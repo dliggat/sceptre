@@ -6,12 +6,13 @@ parameters:
   VpcId: !stack_output vpc::VpcId
   SubnetAZ0Id: !stack_output vpc::PrivateSubnetAZ0
   SubnetAZ1Id: !stack_output vpc::PrivateSubnetAZ1
-  DbName: tamdemodb
+  DbName: demo
   MultiAz: "false"
   PubliclyAccessible: "false"
-  DbEngine: mysql
-  DbVersion: "5.6"
-  DbPort: "3306"
+  DbEngine: oracle-ee
+  DbVersion: "12.1.0.2.v11"
+  LicenseModel: bring-your-own-license
+  DbPort: "1521"
   DbInstanceClass: db.t2.medium
   AllocatedStorage: "10"
   RdsUsername: foobarbaz
