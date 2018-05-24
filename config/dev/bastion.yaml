@@ -1,13 +1,10 @@
-template_path: templates/bastion.yaml
+template_path: templates/singleton-asg.yaml
 
 
 parameters:
-  ResourcePrefix: davedev
+  ResourcePrefix: {{ project_code }}
   VpcId: !stack_output vpc::VpcId
   SubnetAZ0Id: !stack_output vpc::PublicSubnetAZ0
   SubnetAZ1Id: !stack_output vpc::PublicSubnetAZ1
   KeypairName: dliggat-tam
-  AmiId: daveami
   InstanceType: t2.xlarge
-
-

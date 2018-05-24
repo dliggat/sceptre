@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: Autohealing Amazon linux bastion
+Description: Autohealing instance
 
 Parameters:
   ResourcePrefix:
@@ -21,6 +21,7 @@ Parameters:
   AmiId:
     Type: AWS::SSM::Parameter::Value<String>
     Description: The Linux AMI to be used.
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-x86_64-ebs
     # Default: "/aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base"
 
   InstanceType:

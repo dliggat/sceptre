@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Cross account access
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: Trust Configuration
+        Parameters:
+          - TrustedAwsAccountId
+      - Label:
+          default: Level of Access to Grant to the Trusted Account
+        Parameters:
+          - ManagedPolicy
+
+    ParameterLabels:
+      ManagedPolicy:
+        default: Managed Policy
+      TrustedAwsAccountId:
+        default: ID of the trusted AWS account
+      TrustedIamEntity:
+        default: The entity in the trusted AWS account
+
+Parameters:
+  ManagedPolicy:
+    Type: String
+    Default: "arn:aws:iam::aws:policy/ReadOnlyAccess"
+    Description: The managed policy to apply to the trusted entity
+    AllowedValues:
+      - "arn:aws:iam::aws:policy/ReadOnlyAccess"
+      - "arn:aws:iam::aws:policy/PowerUserAccess"
+      - "arn:aws:iam::aws:policy/AdministratorAccess"
+
+  TrustedAwsAccountId:
+    Type: String
+    Description: The account ID to trust
+
+Resources:
+  CrossAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - { Ref: ManagedPolicy }
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "sts:AssumeRole"
+            Principal:
+              AWS:
+                "Fn::Sub":
+                  "arn:aws:iam::${TrustedAwsAccountId}:root"
+
+Outputs:
+  CrossAccountRoleName:
+    Value: { Ref: CrossAccountRole }
+  CrossAccountRoleArn:
+    Value:
+      "Fn::GetAtt":
+        - CrossAccountRole
+        - Arn
+  SigninUrl:
+    Value:
+      "Fn::Join":
+        - ""
+        - - "https://signin.aws.amazon.com/switchrole?account="
+          - { Ref: "AWS::AccountId" }
+          - "&roleName="
+          - { Ref: CrossAccountRole }
+

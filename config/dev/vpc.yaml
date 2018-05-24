@@ -1,7 +1,7 @@
 template_path: templates/vpc.j2
 
 parameters:
-  ResourcePrefix: davedev
+  ResourcePrefix: demos
   VpcCidr: "10.0.0.0/16"
   PublicSubnetAZ0Cidr: "10.0.0.0/24"
   PublicSubnetAZ1Cidr: "10.0.1.0/24"

@@ -1,0 +1,8 @@
+template_path: templates/cross-account-role.yaml
+
+parameters:
+  ManagedPolicy: "arn:aws:iam::aws:policy/ReadOnlyAccess"
+  TrustedAwsAccountId: "590282080527"
+
+
+
