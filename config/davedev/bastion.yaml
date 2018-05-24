@@ -2,12 +2,12 @@ template_path: templates/bastion.yaml
 
 
 parameters:
-  ResourcePrefix: amazon-linux
+  ResourcePrefix: davedev
   VpcId: !stack_output vpc::VpcId
   SubnetAZ0Id: !stack_output vpc::PublicSubnetAZ0
   SubnetAZ1Id: !stack_output vpc::PublicSubnetAZ1
   KeypairName: dliggat-tam
-  AmiId: ami-f2d3638a
+  AmiId: daveami
   InstanceType: t2.xlarge
 
 

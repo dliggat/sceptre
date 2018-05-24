@@ -19,7 +19,9 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
 
   AmiId:
-    Type: AWS::EC2::Image::Id
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: The Linux AMI to be used.
+    # Default: "/aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base"
 
   InstanceType:
     Type: String

@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: S3 website bucket
+
+Parameters:
+  BucketName:
+    Type: String
+
+Resources:
+  S3WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: { Ref: BucketName }
+      WebsiteConfiguration:
+        ErrorDocument: error.html
+        IndexDocument: index.html
+
+  S3WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: { Ref: S3WebsiteBucket }
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: PermitPublicReadObjects
+            Effect: Allow
+            Principal: "*"
+            Action: ["s3:GetObject"]
+            Resource:
+              "Fn::Join":
+                - ""
+                - - "arn:aws:s3:::"
+                  - { Ref: S3WebsiteBucket }
+                  - "/*"

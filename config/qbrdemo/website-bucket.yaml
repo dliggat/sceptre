@@ -1,0 +1,7 @@
+template_path: templates/website-bucket.yaml
+
+
+parameters:
+  BucketName: dliggat-public-web
+
+
