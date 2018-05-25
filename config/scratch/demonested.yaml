@@ -1,0 +1,6 @@
+template_path: templates/dev/master.yaml
+
+parameters:
+  VpcId:  vpc-01efde78
+  SubnetIds: 'subnet-07089e7e,subnet-1eed5e55'
+  TemplateBucket: dliggat-tam-public

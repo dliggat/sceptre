@@ -1,1 +1,3 @@
 region: {{ environment_variable.AWS_REGION }}
+project_code: default
+

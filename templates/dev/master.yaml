@@ -1,0 +1,23 @@
+Parameters:
+    TemplateBucket:
+        Description: Bucket used to store the templates for the nested stacks
+        Type: String
+
+    SubnetIds:
+        Type: List<AWS::EC2::Subnet::Id>
+        Description: Select at two subnets in your selected VPC.
+
+    VpcId:
+        Type: AWS::EC2::VPC::Id
+
+Resources:
+    ASG:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/dev/autohealing.yaml
+            Parameters:
+                ResourcePrefix: foo
+                VpcId: !Ref VpcId
+                SubnetIds:
+                    "Fn::Join": [",", !Ref SubnetIds]
+                InstanceType: t2.large
