@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  TrustedAwsAccountId:
+    Type: String
+    Description: The account ID to trust
+
+Resources:
+  SamlRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        "Fn::Sub":
+          "readonly-${AWS::AccountId}-role"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/ReadOnlyAccess"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "sts:AssumeRoleWithSAML"
+            Principal:
+              Federated:
+                "Fn::Sub":
+                  "arn:aws:iam::${TrustedAwsAccountId}:saml-provider/PROVIDER-NAME"
+            Condition:
+              StringEquals:
+                "SAML:aud": "https://signin.aws.amazon.com/saml"
+
+Outputs:
+  SamlRoleName:
+    Value: { Ref: SamlRole }
+  SamlRoleArn:
+    Value:
+      "Fn::GetAtt":
+        - SamlRole
+        - Arn
+
