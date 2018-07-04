@@ -1,0 +1,4 @@
+template_path: templates/api_gateway_lambda_transform.yaml
+
+parameters:
+  ResourcePrefix: apigw-transform

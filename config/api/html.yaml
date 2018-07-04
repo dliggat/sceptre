@@ -1,0 +1,4 @@
+template_path: templates/api_gateway_lambda_html.yaml
+
+parameters:
+  ResourcePrefix: apigw-html
